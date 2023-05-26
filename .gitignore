@@ -1,0 +1,49 @@
+# Binaries
+bin/
+obj/
+
+# Dependencies
+**/packages/
+**/bower_components/
+**/node_modules/
+
+# Build artifacts
+*.swp
+*.suo
+*.user
+*.vs/
+*.vscode/
+*.sln.cache
+
+# Logs
+logs/
+*.log
+
+# IDE-specific files
+.vscode/
+*.suo
+*.user
+*.sln.cache
+*.sln.docstates
+
+# Compiled DLLs and PDBs
+*.dll
+*.pdb
+
+# Generated files
+_*
+*.bak
+*.cache
+*.csv
+*.db
+*.dat
+*.exe
+*.json
+*.swp
+*.tmp
+*.xml
+*.log
+
+# Publish profiles
+PublishProfiles/
+*.pubxml
