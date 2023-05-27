@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace diskode.Migrations
 {
     [DbContext(typeof(DiskodeDbContext))]
-    [Migration("20230526092624_InitialCreate")]
+    [Migration("20230527183855_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -80,6 +80,10 @@ namespace diskode.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.HasKey("PostId");
 
                     b.HasIndex("CreatorId");
@@ -87,33 +91,18 @@ namespace diskode.Migrations
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("Diskode.Models.PostTags", b =>
+            modelBuilder.Entity("Diskode.Models.PostTag", b =>
                 {
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TagId")
-                        .HasColumnType("int");
+                    b.Property<string>("TagName")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
-                    b.HasKey("PostId", "TagId");
+                    b.HasKey("PostId", "TagName");
 
                     b.ToTable("PostTags");
-                });
-
-            modelBuilder.Entity("Diskode.Models.Tag", b =>
-                {
-                    b.Property<int>("TagId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar");
-
-                    b.HasKey("TagId");
-
-                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Diskode.Models.User", b =>
@@ -138,6 +127,8 @@ namespace diskode.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.HasKey("UserId");
+
+                    b.HasAlternateKey("Email");
 
                     b.ToTable("Users");
                 });
@@ -239,7 +230,7 @@ namespace diskode.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("Diskode.Models.PostTags", b =>
+            modelBuilder.Entity("Diskode.Models.PostTag", b =>
                 {
                     b.HasOne("Diskode.Models.Post", "Post")
                         .WithMany("Tags")
@@ -247,15 +238,7 @@ namespace diskode.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Diskode.Models.Tag", "Tag")
-                        .WithMany("Posts")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Post");
-
-                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("Diskode.Models.UserLikedComments", b =>
@@ -348,11 +331,6 @@ namespace diskode.Migrations
                     b.Navigation("LikedByUsers");
 
                     b.Navigation("Tags");
-                });
-
-            modelBuilder.Entity("Diskode.Models.Tag", b =>
-                {
-                    b.Navigation("Posts");
                 });
 
             modelBuilder.Entity("Diskode.Models.User", b =>

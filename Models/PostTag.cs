@@ -4,12 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Diskode.Models
 {
-    public class PostTags
+    public class PostTag
     {
-        public int TagId { get; set; }
-
-        [ForeignKey("TagId")]
-        public Tag Tag { get; set; } = null!;
+        [StringLength(maximumLength: 50, MinimumLength = 1)]
+        public string TagName { get; set; } = null!;
 
         public int PostId { get; set; }
 

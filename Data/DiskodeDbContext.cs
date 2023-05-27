@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using EntityFramework.Exceptions;
 using Diskode.Models;
 
 namespace Diskode.Data
@@ -9,8 +10,7 @@ namespace Diskode.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Post> Posts { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
-        public DbSet<Tag> Tags { get; set; } = null!;
-        public DbSet<PostTags> PostTags { get; set; } = null!;
+        public DbSet<PostTag> PostTags { get; set; } = null!;
         public DbSet<UserLikedPosts> UserLikedPosts { get; set; } = null!;
         public DbSet<UserLikedComments> UserLikedComments { get; set; } = null!;
         public DbSet<UsersFollowUsers> UsersFollowUsers { get; set; } = null!;
@@ -24,6 +24,7 @@ namespace Diskode.Data
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DiskodeDbContext).Assembly);
         }
+
     }
     public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
     {
@@ -32,6 +33,10 @@ namespace Diskode.Data
             // Specify primary key 
             builder
             .HasKey(user => user.UserId);
+
+            // Email should be unique
+            builder
+            .HasAlternateKey(user => user.Email);
 
             builder.Property(user => user.Name)
             .HasMaxLength(50)
@@ -112,7 +117,7 @@ namespace Diskode.Data
             .OnDelete(DeleteBehavior.Cascade);
 
             builder
-            .HasMany<PostTags>(post => post.Tags)
+            .HasMany<PostTag>(post => post.Tags)
             .WithOne(pt => pt.Post)
             .HasForeignKey(pt => pt.PostId)
             .OnDelete(DeleteBehavior.Cascade);
@@ -165,30 +170,6 @@ namespace Diskode.Data
             .HasMany<UserLikedComments>(comment => comment.LikedByUsers)
             .WithOne(ulc => ulc.Comment)
             .HasForeignKey(ulc => ulc.CommentId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        }
-    }
-
-    public class TagEntityTypeConfiguration : IEntityTypeConfiguration<Tag>
-    {
-        public void Configure(EntityTypeBuilder<Tag> builder)
-        {
-            // Specify primary key 
-            builder
-            .HasKey(Tag => Tag.TagId);
-
-            builder
-            .Property(tag => tag.Name)
-            .HasMaxLength(50)
-            .HasColumnType("varchar");
-
-            // Specify Relationships
-
-            builder
-            .HasMany<PostTags>(tag => tag.Posts)
-            .WithOne(pt => pt.Tag)
-            .HasForeignKey(pt => pt.PostId)
             .OnDelete(DeleteBehavior.Cascade);
 
         }
@@ -286,21 +267,16 @@ namespace Diskode.Data
         }
     }
 
-    public class PostTagsEntityTypeConfiguration : IEntityTypeConfiguration<PostTags>
+    public class PostTagEntityTypeConfiguration : IEntityTypeConfiguration<PostTag>
     {
-        public void Configure(EntityTypeBuilder<PostTags> builder)
+        public void Configure(EntityTypeBuilder<PostTag> builder)
         {
 
             // Composite Primary Key
             builder
-            .HasKey(x => new { x.PostId, x.TagId });
+            .HasKey(x => new { x.PostId, x.TagName });
 
             // Configure relationships
-            builder
-            .HasOne<Tag>(pt => pt.Tag)
-            .WithMany(tag => tag.Posts)
-            .HasForeignKey(pt => pt.TagId)
-            .OnDelete(DeleteBehavior.Cascade);
 
             builder
             .HasOne<Post>(pt => pt.Post)

@@ -10,6 +10,8 @@ namespace Diskode.Models
 
         public required int CreatorId { get; set; }
 
+        public required string Title { get; set; }
+
         public required string Content { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
@@ -23,6 +25,6 @@ namespace Diskode.Models
 
         public ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
 
-        public ICollection<PostTags> Tags { get; set; } = new HashSet<PostTags>();
+        public ICollection<PostTag> Tags { get; set; } = new HashSet<PostTag>();
     }
 }
