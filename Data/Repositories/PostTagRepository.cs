@@ -47,4 +47,17 @@ public class PostTagRepository : IPostTagRepository
             throw new RepositoryException("An error occurred while adding tag to post.", ex);
         }
     }
+
+    public async Task<IEnumerable<string>> GetTagsAsync()
+    {
+        try
+        {
+            var tags = await _context.PostTags.Select(pt => pt.TagName).ToListAsync();
+            return tags;
+        }
+        catch (Exception ex)
+        {
+            throw new RepositoryException("An error occurred while fetching posts by tag name.", ex);
+        }
+    }
 }
