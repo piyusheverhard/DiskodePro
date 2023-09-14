@@ -1,3 +1,4 @@
+using DiskodePro.WebApp.Data.DTOs;
 using DiskodePro.WebApp.Exceptions;
 using DiskodePro.WebApp.Models;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,16 @@ public class PostRepository : IPostRepository
         _context = dbContext;
     }
 
-    public async Task<Post> CreatePostAsync(Post post)
+    public async Task<Post> CreatePostAsync(PostDTO postDto)
     {
         try
         {
+            var post = new Post
+            {
+                CreatorId = postDto.CreatorId,
+                Title = postDto.Title,
+                Content = postDto.Content
+            };
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
             return post;
@@ -110,14 +117,14 @@ public class PostRepository : IPostRepository
         }
     }
 
-    public async Task<Post> UpdatePostAsync(Post updatedPost)
+    public async Task<Post> UpdatePostAsync(int postId, PostDTO updatedPost)
     {
         try
         {
-            var existingPost = await _context.Posts.FindAsync(updatedPost.PostId);
+            var existingPost = await _context.Posts.FindAsync(postId);
 
             if (existingPost == null)
-                throw new PostNotFoundException($"Post with ID {updatedPost.PostId} does not exist.");
+                throw new PostNotFoundException($"Post with ID {postId} does not exist.");
 
             existingPost.Title = updatedPost.Title;
             existingPost.Content = updatedPost.Content;

@@ -1,6 +1,6 @@
+using DiskodePro.WebApp.Data.DTOs;
 using DiskodePro.WebApp.Data.Repositories;
 using DiskodePro.WebApp.Exceptions;
-using DiskodePro.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskodePro.WebApp.Controllers;
@@ -17,7 +17,7 @@ public class PostController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreatePost([FromBody] Post post)
+    public async Task<IActionResult> CreatePost([FromBody] PostDTO post)
     {
         try
         {
@@ -100,13 +100,11 @@ public class PostController : ControllerBase
     }
 
     [HttpPut("{postId}")]
-    public async Task<IActionResult> UpdatePost(int postId, [FromBody] Post updatedPost)
+    public async Task<IActionResult> UpdatePost(int postId, [FromBody] PostDTO updatedPost)
     {
-        if (postId != updatedPost.PostId) return BadRequest("Mismatched post ID.");
-
         try
         {
-            var post = await _postRepository.UpdatePostAsync(updatedPost);
+            var post = await _postRepository.UpdatePostAsync(postId, updatedPost);
             return Ok(post);
         }
         catch (PostNotFoundException ex)

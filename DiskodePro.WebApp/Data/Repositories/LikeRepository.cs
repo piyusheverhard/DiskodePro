@@ -18,7 +18,7 @@ public class LikeRepository : ILikeRepository
         try
         {
             var user = await _context.Users
-                .Include(u => u.LikedComments)
+                .Include(u => u.LikedComments).ThenInclude(userLikedComments => userLikedComments.Comment)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
             if (user == null) throw new UserNotFoundException($"User with ID {userId} not found.");
 
@@ -40,7 +40,7 @@ public class LikeRepository : ILikeRepository
         try
         {
             var user = await _context.Users
-                .Include(u => u.LikedPosts)
+                .Include(u => u.LikedPosts).ThenInclude(userLikedPosts => userLikedPosts.Post)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null) throw new UserNotFoundException($"User with ID {userId} not found.");
@@ -63,7 +63,7 @@ public class LikeRepository : ILikeRepository
         try
         {
             var comment = await _context.Comments
-                .Include(c => c.LikedByUsers)
+                .Include(c => c.LikedByUsers).ThenInclude(userLikedComments => userLikedComments.User)
                 .FirstOrDefaultAsync(c => c.CommentId == commentId);
             if (comment == null) throw new CommentNotFoundException($"Comment with ID {commentId} not found.");
 
@@ -84,7 +84,7 @@ public class LikeRepository : ILikeRepository
         try
         {
             var post = await _context.Posts
-                .Include(p => p.LikedByUsers)
+                .Include(p => p.LikedByUsers).ThenInclude(userLikedPosts => userLikedPosts.User)
                 .FirstOrDefaultAsync(p => p.PostId == postId);
 
             if (post == null) throw new PostNotFoundException($"Post with ID {postId} not found.");

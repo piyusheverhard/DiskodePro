@@ -1,3 +1,4 @@
+using DiskodePro.WebApp.Data.DTOs;
 using DiskodePro.WebApp.Data.Repositories;
 using DiskodePro.WebApp.Exceptions;
 using DiskodePro.WebApp.Models;
@@ -51,7 +52,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<User>> CreateUser([FromBody] User user)
+    public async Task<ActionResult<User>> CreateUser([FromBody] UserDTO user)
     {
         try
         {
@@ -69,14 +70,12 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult<User>> UpdateUser(int id, [FromBody] User updatedUser)
+    [HttpPut("{userId}")]
+    public async Task<ActionResult<User>> UpdateUser(int userId, [FromBody] UserDTO updatedUser)
     {
-        if (id != updatedUser.UserId) return BadRequest("User ID mismatch.");
-
         try
         {
-            var user = await _userRepository.UpdateUserAsync(updatedUser);
+            var user = await _userRepository.UpdateUserAsync(userId, updatedUser);
             return Ok(user);
         }
         catch (UserNotFoundException ex)

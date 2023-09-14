@@ -1,6 +1,6 @@
+using DiskodePro.WebApp.Data.DTOs;
 using DiskodePro.WebApp.Data.Repositories;
 using DiskodePro.WebApp.Exceptions;
-using DiskodePro.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskodePro.WebApp.Controllers;
@@ -17,7 +17,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateRootComment([FromBody] Comment comment)
+    public async Task<IActionResult> CreateRootComment([FromBody] CommentDTO comment)
     {
         try
         {
@@ -40,7 +40,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpPost("{parentCommentId}/replies")]
-    public async Task<IActionResult> CreateReply(int parentCommentId, [FromBody] Comment reply)
+    public async Task<IActionResult> CreateReply(int parentCommentId, [FromBody] CommentDTO reply)
     {
         reply.ParentCommentId = parentCommentId;
 
@@ -140,13 +140,11 @@ public class CommentController : ControllerBase
     }
 
     [HttpPut("{commentId}")]
-    public async Task<IActionResult> UpdateComment(int commentId, [FromBody] Comment updatedComment)
+    public async Task<IActionResult> UpdateComment(int commentId, [FromBody] CommentDTO updatedCommentDto)
     {
-        if (commentId != updatedComment.CommentId) return BadRequest("Invalid comment ID.");
-
         try
         {
-            var comment = await _commentRepository.UpdateCommentAsync(updatedComment);
+            var comment = await _commentRepository.UpdateCommentAsync(commentId, updatedCommentDto);
             return Ok(comment);
         }
         catch (CommentNotFoundException ex)

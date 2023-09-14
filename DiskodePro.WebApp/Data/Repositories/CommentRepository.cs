@@ -1,3 +1,4 @@
+using DiskodePro.WebApp.Data.DTOs;
 using DiskodePro.WebApp.Exceptions;
 using DiskodePro.WebApp.Models;
 using Microsoft.EntityFrameworkCore;
@@ -13,23 +14,29 @@ public class CommentRepository : ICommentRepository
         _context = dbContext;
     }
 
-    public async Task<Comment> CreateReplyAsync(Comment reply)
+    public async Task<Comment> CreateReplyAsync(CommentDTO replyCommentDto)
     {
         try
         {
-            var post = await _context.Posts.FindAsync(reply.PostId);
-            var parentComment = await _context.Comments.FindAsync(reply.ParentCommentId);
-            var user = await _context.Users.FindAsync(reply.CreatorId);
+            var post = await _context.Posts.FindAsync(replyCommentDto.PostId);
+            var parentComment = await _context.Comments.FindAsync(replyCommentDto.ParentCommentId);
+            var user = await _context.Users.FindAsync(replyCommentDto.CreatorId);
 
-            if (post == null) throw new PostNotFoundException($"Post with ID {reply.PostId} not found.");
+            if (post == null) throw new PostNotFoundException($"Post with ID {replyCommentDto.PostId} not found.");
 
             if (parentComment == null)
-                throw new CommentNotFoundException($"Parent comment with ID {reply.ParentCommentId} not found.");
+                throw new CommentNotFoundException(
+                    $"Parent comment with ID {replyCommentDto.ParentCommentId} not found.");
 
-            if (user == null) throw new UserNotFoundException($"User with ID {reply.CreatorId} not found.");
+            if (user == null) throw new UserNotFoundException($"User with ID {replyCommentDto.CreatorId} not found.");
 
-            reply.CreatedAt = DateTime.UtcNow;
-
+            var reply = new Comment
+            {
+                PostId = replyCommentDto.PostId,
+                ParentCommentId = replyCommentDto.ParentCommentId,
+                CreatorId = replyCommentDto.CreatorId,
+                Content = replyCommentDto.Content
+            };
             _context.Comments.Add(reply);
             await _context.SaveChangesAsync();
 
@@ -53,19 +60,23 @@ public class CommentRepository : ICommentRepository
         }
     }
 
-    public async Task<Comment> CreateRootCommentAsync(Comment comment)
+    public async Task<Comment> CreateRootCommentAsync(CommentDTO commentDto)
     {
         try
         {
-            var post = await _context.Posts.FindAsync(comment.PostId);
-            var user = await _context.Users.FindAsync(comment.CreatorId);
+            var post = await _context.Posts.FindAsync(commentDto.PostId);
+            var user = await _context.Users.FindAsync(commentDto.CreatorId);
 
-            if (post == null) throw new PostNotFoundException($"Post with ID {comment.PostId} not found.");
+            if (post == null) throw new PostNotFoundException($"Post with ID {commentDto.PostId} not found.");
 
-            if (user == null) throw new UserNotFoundException($"User with ID {comment.CreatorId} not found.");
+            if (user == null) throw new UserNotFoundException($"User with ID {commentDto.CreatorId} not found.");
 
-            comment.CreatedAt = DateTime.UtcNow;
-
+            var comment = new Comment
+            {
+                CreatorId = commentDto.CreatorId,
+                PostId = commentDto.PostId,
+                Content = commentDto.Content
+            };
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
 
@@ -155,7 +166,8 @@ public class CommentRepository : ICommentRepository
     {
         try
         {
-            var parentComment = await _context.Comments.FindAsync(parentCommentId);
+            var parentComment = await _context.Comments.Include(c => c.Replies)
+                .FirstOrDefaultAsync(c => c.CommentId == parentCommentId);
             if (parentComment == null)
                 throw new CommentNotFoundException($"Parent Comment with ID {parentCommentId} not found.");
 
@@ -177,7 +189,8 @@ public class CommentRepository : ICommentRepository
     {
         try
         {
-            var post = await _context.Posts.FindAsync(postId);
+            var post = await _context.Posts.Include(p => p.Comments)
+                .FirstOrDefaultAsync(c => c.PostId == postId);
             if (post == null) throw new PostNotFoundException($"Post with ID {postId} not found.");
 
             var rootComments = post.Comments.Where(c => c.ParentCommentId == null).ToList();
@@ -194,21 +207,21 @@ public class CommentRepository : ICommentRepository
         }
     }
 
-    public async Task<Comment> UpdateCommentAsync(Comment updatedComment)
+    public async Task<Comment> UpdateCommentAsync(int commentId, CommentDTO updatedCommentDto)
     {
         try
         {
-            var comment = await _context.Comments.FindAsync(updatedComment.CommentId);
+            var comment = await _context.Comments.FindAsync(commentId);
 
             if (comment == null || comment.IsDeleted)
-                throw new CommentNotFoundException($"Comment with ID {updatedComment.CommentId} not found.");
+                throw new CommentNotFoundException($"Comment with ID {commentId} not found.");
 
             // Update the comment properties
-            comment.Content = updatedComment.Content;
-            comment.ModifiedAt = DateTime.UtcNow;
+            comment.Content = updatedCommentDto.Content;
+            comment.ModifiedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
-            return updatedComment;
+            return comment;
         }
         catch (CommentNotFoundException)
         {

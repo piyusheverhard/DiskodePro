@@ -1,3 +1,4 @@
+using DiskodePro.WebApp.Data.DTOs;
 using DiskodePro.WebApp.Exceptions;
 using DiskodePro.WebApp.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,16 @@ public class UserRepository : IUserRepository
         _context = dbContext;
     }
 
-    public async Task<User> CreateUserAsync(User user)
+    public async Task<User> CreateUserAsync(UserDTO userDto)
     {
         try
         {
+            var user = new User
+            {
+                Name = userDto.Name,
+                Email = userDto.Email,
+                Password = userDto.Password
+            };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user;
@@ -99,11 +106,10 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<User> UpdateUserAsync(User updatedUser)
+    public async Task<User> UpdateUserAsync(int userId, UserDTO updatedUser)
     {
         try
         {
-            var userId = updatedUser.UserId;
             var existingUser = await _context.Users.FindAsync(userId);
 
             if (existingUser == null) throw new UserNotFoundException($"User with ID {userId} not found.");
@@ -111,8 +117,7 @@ public class UserRepository : IUserRepository
             // Update the existing user's properties with the new values
             existingUser.Name = updatedUser.Name;
             existingUser.Email = updatedUser.Email;
-            // Update other properties as needed
-
+            existingUser.Password = updatedUser.Password;
             await _context.SaveChangesAsync();
 
             return existingUser;

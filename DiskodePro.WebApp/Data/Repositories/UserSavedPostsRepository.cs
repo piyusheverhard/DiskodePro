@@ -18,7 +18,7 @@ public class UserSavedPostsRepository : IUserSavedPostsRepository
         try
         {
             var user = await _context.Users
-                .Include(u => u.SavedPosts)
+                .Include(u => u.SavedPosts).ThenInclude(userSavedPosts => userSavedPosts.Post)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null) throw new UserNotFoundException($"User with ID {userId} not found.");
