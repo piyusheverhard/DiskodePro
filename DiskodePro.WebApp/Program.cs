@@ -1,5 +1,5 @@
-using Diskode.Data;
-using Diskode.Data.Repositories;
+using DiskodePro.WebApp.Data;
+using DiskodePro.WebApp.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,13 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<DiskodeDbContext>(options =>
 {
-    IConfigurationRoot configuration = new ConfigurationBuilder()
+    var configuration = new ConfigurationBuilder()
         .SetBasePath(Directory.GetCurrentDirectory())
         .AddJsonFile("appsettings.json")
         .Build();
 
-    string connectionString = configuration.GetConnectionString("DefaultConnection")!;
-    ServerVersion serverVersion = ServerVersion.AutoDetect(connectionString);
+    var connectionString = configuration.GetConnectionString("DefaultConnection")!;
+    var serverVersion = ServerVersion.AutoDetect(connectionString);
     options.UseMySql(connectionString, serverVersion);
 });
 
@@ -37,11 +37,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-        options.RoutePrefix = string.Empty;
-    });
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
