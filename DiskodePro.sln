@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskodePro.WebApp", "DiskodePro.WebApp\DiskodePro.WebApp.csproj", "{4AE0E36F-6B5E-4C89-8E5C-F00B05E342AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskodePro.WebApi", "DiskodePro.WebApi\DiskodePro.WebApi.csproj", "{4AE0E36F-6B5E-4C89-8E5C-F00B05E342AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
