@@ -3,7 +3,6 @@ using DiskodePro.WebApi.Data.DTOs;
 using DiskodePro.WebApi.Data.Repositories;
 using DiskodePro.WebApi.Exceptions;
 using DiskodePro.WebApi.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -54,14 +53,14 @@ public class UserControllerTests
         var mockUserRepository = new Mock<IUserRepository>();
         var expectedUsers = new List<User>
         {
-            new User
+            new()
             {
                 UserId = 1,
                 Name = "User Name",
                 Email = "user@example.com",
                 Password = "12345678"
             },
-            new User
+            new()
             {
                 UserId = 2,
                 Name = "User Name",
@@ -78,15 +77,13 @@ public class UserControllerTests
         var actionResult = await userController.GetUsers();
         var okObjectResult = actionResult.Result as OkObjectResult;
         var actualUsers = okObjectResult?.Value as List<User>;
-        
+
         // Assert
         Assert.That(okObjectResult, Is.Not.Null);
         Assert.That(actualUsers, Is.Not.Null);
         Assert.That(actualUsers!, Has.Count.EqualTo(expectedUsers.Count));
         for (var i = 0; i < expectedUsers.Count; i++)
-        {
             Assert.That(IsSameActualAndExpectedUser(actualUsers![i], expectedUsers[i]));
-        }
     }
 
     [Test]
@@ -150,9 +147,10 @@ public class UserControllerTests
         var userController = new UserController(mockUserRepository.Object);
 
         // Act
-        var actionResult = await userController.CreateUser(new UserDTO {
-            Email = "taken@example.com", 
-            Name = "", 
+        var actionResult = await userController.CreateUser(new UserDTO
+        {
+            Email = "taken@example.com",
+            Name = "",
             Password = "12345678"
         });
 
@@ -195,20 +193,21 @@ public class UserControllerTests
     }
 
     [Test]
-    public async Task UpdateUserSendsConflictForDuplicateEmail() 
+    public async Task UpdateUserSendsConflictForDuplicateEmail()
     {
         // Arrange
         var mockUserRepository = new Mock<IUserRepository>();
         mockUserRepository.Setup(
                 userRepository => userRepository
-                    .UpdateUserAsync(It.IsAny<int>(), (It.IsAny<UserDTO>())))
+                    .UpdateUserAsync(It.IsAny<int>(), It.IsAny<UserDTO>()))
             .ThrowsAsync(new DuplicateEmailException("", new Exception()));
         var userController = new UserController(mockUserRepository.Object);
 
         // Act
-        var actionResult = await userController.UpdateUser(1, new UserDTO {
-            Email = "taken@example.com", 
-            Name = "", 
+        var actionResult = await userController.UpdateUser(1, new UserDTO
+        {
+            Email = "taken@example.com",
+            Name = "",
             Password = "12345678"
         });
 
@@ -222,14 +221,15 @@ public class UserControllerTests
         // Arrange
         var mockUserRepository = new Mock<IUserRepository>();
         mockUserRepository.Setup(userRepository => userRepository
-                .UpdateUserAsync(It.IsAny<int>(), (It.IsAny<UserDTO>())))
+                .UpdateUserAsync(It.IsAny<int>(), It.IsAny<UserDTO>()))
             .ThrowsAsync(new UserNotFoundException(""));
         var userController = new UserController(mockUserRepository.Object);
 
         // Act
-        var actionResult = await userController.UpdateUser(1, new UserDTO {
-            Email = "taken@example.com", 
-            Name = "", 
+        var actionResult = await userController.UpdateUser(1, new UserDTO
+        {
+            Email = "taken@example.com",
+            Name = "",
             Password = "12345678"
         });
 
@@ -243,12 +243,12 @@ public class UserControllerTests
         //Arrange
         var mockUserRepository = new Mock<IUserRepository>();
         mockUserRepository.Setup(
-                userRepository => userRepository.DeleteUserAsync(It.IsAny<int>()));
+            userRepository => userRepository.DeleteUserAsync(It.IsAny<int>()));
         var userController = new UserController(mockUserRepository.Object);
-        
+
         //Act
         var result = await userController.DeleteUser(1);
-        
+
         //Assert
         Assert.That(result, Is.InstanceOf(typeof(NoContentResult)));
     }
@@ -258,14 +258,13 @@ public class UserControllerTests
     {
         //Arrange
         var mockUserRepository = new Mock<IUserRepository>();
-        mockUserRepository.Setup(
-            userRepository => userRepository.DeleteUserAsync(It.IsAny<int>()))
+        mockUserRepository.Setup(userRepository => userRepository.DeleteUserAsync(It.IsAny<int>()))
             .ThrowsAsync(new UserNotFoundException(""));
         var userController = new UserController(mockUserRepository.Object);
-        
+
         //Act
         var result = await userController.DeleteUser(1);
-        
+
         //Assert
         Assert.That(result, Is.InstanceOf(typeof(NotFoundObjectResult)));
     }
