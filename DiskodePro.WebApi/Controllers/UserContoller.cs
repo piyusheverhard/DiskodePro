@@ -18,7 +18,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    public async Task<IActionResult> GetUsers()
     {
         try
         {
@@ -33,7 +33,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<User>> GetUser(int id)
+    public async Task<IActionResult> GetUser(int id)
     {
         try
         {
@@ -52,7 +52,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<User>> CreateUser([FromBody] UserDTO user)
+    public async Task<IActionResult> CreateUser([FromBody] UserDTO user)
     {
         try
         {
@@ -71,7 +71,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("{userId}")]
-    public async Task<ActionResult<User>> UpdateUser(int userId, [FromBody] UserDTO updatedUser)
+    public async Task<IActionResult> UpdateUser(int userId, [FromBody] UserDTO updatedUser)
     {
         try
         {

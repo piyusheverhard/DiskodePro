@@ -38,7 +38,7 @@ public class UserControllerTests
 
         // Act
         var actionResult = await userController.GetUser(expectedUser.UserId);
-        var actualUser = actionResult.Result as OkObjectResult;
+        var actualUser = actionResult as OkObjectResult;
 
         // Assert
         Assert.That(actualUser, Is.Not.Null);
@@ -75,7 +75,7 @@ public class UserControllerTests
 
         // Act
         var actionResult = await userController.GetUsers();
-        var okObjectResult = actionResult.Result as OkObjectResult;
+        var okObjectResult = actionResult as OkObjectResult;
         var actualUsers = okObjectResult?.Value as List<User>;
 
         // Assert
@@ -100,7 +100,7 @@ public class UserControllerTests
         var actionResult = await userController.GetUser(1);
 
         // Assert
-        Assert.That(actionResult.Result, Is.InstanceOf(typeof(NotFoundObjectResult)));
+        Assert.That(actionResult, Is.InstanceOf(typeof(NotFoundObjectResult)));
     }
 
     [Test]
@@ -127,7 +127,7 @@ public class UserControllerTests
 
         // Act
         var actionResult = await userController.CreateUser(userDto);
-        var createdAction = actionResult.Result as CreatedAtActionResult;
+        var createdAction = actionResult as CreatedAtActionResult;
         var createdUser = createdAction?.Value as User;
 
         // Assert
@@ -155,7 +155,7 @@ public class UserControllerTests
         });
 
         // Assert
-        Assert.That(actionResult.Result, Is.InstanceOf(typeof(ConflictObjectResult)));
+        Assert.That(actionResult, Is.InstanceOf(typeof(ConflictObjectResult)));
     }
 
     [Test]
@@ -184,7 +184,7 @@ public class UserControllerTests
 
         // Act
         var actionResult = await userController.UpdateUser(userId, userDto);
-        var actualUser = actionResult.Result as OkObjectResult;
+        var actualUser = actionResult as OkObjectResult;
 
         // Assert
         Assert.That(actualUser, Is.Not.Null);
@@ -212,7 +212,7 @@ public class UserControllerTests
         });
 
         // Assert
-        Assert.That(actionResult.Result, Is.InstanceOf(typeof(ConflictObjectResult)));
+        Assert.That(actionResult, Is.InstanceOf(typeof(ConflictObjectResult)));
     }
 
     [Test]
@@ -234,7 +234,7 @@ public class UserControllerTests
         });
 
         // Assert
-        Assert.That(actionResult.Result, Is.InstanceOf(typeof(NotFoundObjectResult)));
+        Assert.That(actionResult, Is.InstanceOf(typeof(NotFoundObjectResult)));
     }
 
     [Test]
