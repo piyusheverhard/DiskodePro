@@ -18,6 +18,9 @@ public class PostRepository : IPostRepository
     {
         try
         {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == postDto.CreatorId);
+            if (user is null)
+                throw new UserNotFoundException($"User with id {postDto.CreatorId} doesn't exists");
             var post = new Post
             {
                 CreatorId = postDto.CreatorId,
@@ -27,6 +30,10 @@ public class PostRepository : IPostRepository
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
             return post;
+        }
+        catch (UserNotFoundException ex)
+        {
+            throw;
         }
         catch (DbUpdateException ex)
         {
@@ -103,7 +110,8 @@ public class PostRepository : IPostRepository
                 .Include(user => user.CreatedPosts)
                 .FirstOrDefaultAsync(user => user.UserId == userId);
 
-            if (user == null) throw new UserNotFoundException($"User with ID {userId} does not exist.");
+            if (user == null) 
+                throw new UserNotFoundException($"User with ID {userId} does not exist.");
 
             return user.CreatedPosts.ToList();
         }
