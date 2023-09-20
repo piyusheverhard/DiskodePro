@@ -24,6 +24,10 @@ public class PostController : ControllerBase
             var createdPost = await _postRepository.CreatePostAsync(post);
             return CreatedAtAction(nameof(GetPostById), new { postId = createdPost.PostId }, createdPost);
         }
+        catch (UserNotFoundException ex)
+        {
+            return BadRequest(ex.Message);
+        } 
         catch (RepositoryException ex)
         {
             return StatusCode(500, $"An error occurred while creating post. {ex.Message}");
