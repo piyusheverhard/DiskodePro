@@ -31,7 +31,7 @@ public class PostRepository : IPostRepository
             await _context.SaveChangesAsync();
             return post;
         }
-        catch (UserNotFoundException ex)
+        catch (UserNotFoundException)
         {
             throw;
         }
